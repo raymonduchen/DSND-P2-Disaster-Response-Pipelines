@@ -1,6 +1,6 @@
 # Disaster Response Pipeline
 
-A web app where an emergency worker can input a new message and get classification results in several categories is implemented. The disaster data is provided by [Figure Eight](https://www.figure-eight.com/) and there are three components in this project, including 1. ETL pipeline 2. ML pipeline 3. Flask Web app.
+A web app where an emergency worker can input a new message and get classification results in several categories is implemented. The disaster data is provided by [Figure Eight](https://www.figure-eight.com/) and there are three components in this project, including 1. ETL Pipeline 2. ML Pipeline 3. Flask Web App.
 
 
 
