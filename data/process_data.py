@@ -3,6 +3,15 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath='messages.csv', categories_filepath='categories.csv'):
+    '''
+    Load data from a database
+    Input : messages_filepath - String
+              file path to messages data csv
+            categories_filepath - String
+              file path to categories data csv
+    Output : df - Pandas DataFrame
+               dataframe contained merged message and categories data
+    '''
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     df = pd.merge(messages, categories, on='id')
@@ -10,6 +19,14 @@ def load_data(messages_filepath='messages.csv', categories_filepath='categories.
 
 
 def clean_data(df):
+    '''
+    Transform one categories to a seperate category columns, clean and remove duplicated data 
+    Input : df - Pandas DataFrame
+              DataFrame from load_data output
+    Output : df - Pandas DataFrame
+               Cleansed DataFrame
+    '''
+
     # create a dataframe of the 36 individual category columns
     categories = df.categories.str.split(";", expand=True)
     
@@ -52,11 +69,21 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    '''
+    Save DataFrame from clean_data() function to a database
+    Input : df - Pandas DataFrame
+              DataFrame from clean_data() output to be saved
+            database_filename - String
+              filename of database that input DataFrame will be saved to
+    '''
     engine = create_engine('sqlite:///'+database_filename)
     df.to_sql('DisasterResponse', engine, index=False, if_exists='replace')
 
 
 def main():
+    '''
+    Main function of ETL pipeline
+    '''
     if len(sys.argv) == 4:
 
         messages_filepath, categories_filepath, database_filepath = sys.argv[1:]

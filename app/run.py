@@ -15,11 +15,16 @@ import sys
 sys.path.append("../models")
 from train_classifier import StartingVerbExtractor
 
-
-
 app = Flask(__name__)
 
 def tokenize(text):
+    '''
+    pipeline to tokenize text
+    Input : text - String
+              text to be tokenized
+    Output : clean_tokens - list
+               list of tokenized text
+    '''
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
 
@@ -42,7 +47,10 @@ model = joblib.load("../models/classifier.pkl")
 @app.route('/')
 @app.route('/index')
 def index():
-    
+    '''
+    Trained model overview visualization. Two bar charts of overview of training dataset are visualized.
+    One is aid related message counts classified by different genre, and the other is medical help message counts
+    '''
     # extract data needed for visuals    
     genre_aid_related = df[df['aid_related']==1].groupby('genre').count()['message']
     genre_not_aid_related = df[df['aid_related']==0].groupby('genre').count()['message']
@@ -120,6 +128,9 @@ def index():
 # web page that handles user query and displays model results
 @app.route('/go')
 def go():
+    '''
+    function used for handling user query and displaying model results
+    '''
     # save user input in query
     query = request.args.get('query', '') 
 
@@ -136,6 +147,9 @@ def go():
 
 
 def main():
+    '''
+    Main function of Flask Web App
+    '''
     app.run(host='0.0.0.0', port=3001, debug=True)
 
 

@@ -27,6 +27,18 @@ import pickle
 nltk.download(['punkt', 'wordnet', 'stopwords', 'averaged_perceptron_tagger'])
 
 def load_data(database_filepath='DisasterResponse.db'):
+    '''
+    Load data from a database
+    Input : database_filepath - String
+              file path to database that generated from ETL pipeline
+    Output : X - Numpy Array
+    		   feature variables for ML pipeline 
+             Y - Numpy Array
+               target variable for ML pipeline
+             category_names - Numpy Array
+               column names of target variable
+    '''
+
     engine = create_engine('sqlite:///'+database_filepath)
     df = pd.read_sql('SELECT * FROM DisasterResponse', engine)
     
@@ -37,6 +49,13 @@ def load_data(database_filepath='DisasterResponse.db'):
     return X, Y, category_names
 
 def tokenize(text):
+    '''
+    Normalize, tokenize, remove stop words and stem input text
+    Input : text - String
+              text to be tokenized
+    Output : stemmed - list
+    		   list of tokenized text
+    '''
     # Normalization : Lower case and punctuation removal
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
 
@@ -53,6 +72,9 @@ def tokenize(text):
 
 
 class StartingVerbExtractor(BaseEstimator, TransformerMixin):
+    '''
+	Customized function that tests if a sentence started with a verb
+    '''
     def starting_verb(self, text):
         sentence_list = nltk.sent_tokenize(text)
         for sentence in sentence_list:
@@ -72,6 +94,11 @@ class StartingVerbExtractor(BaseEstimator, TransformerMixin):
         return pd.DataFrame(X_tagged)
 
 def build_model():
+    '''
+	Grid Search a set of parameters for a designed pipeline
+	Output : cv - sklearn GridSearchCV object
+	           scikit learn GridSearchCV object used for latter model fitting
+    '''
     pipeline = Pipeline([
             ('features', FeatureUnion([
                 ('text_pipeline', Pipeline([
@@ -98,6 +125,17 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):    
+    '''
+	Evaluate model performance through test set
+	Input : model - sklearn GridSearchCV object
+			  trained model used for performance evaluation
+	        X_test - Numpy array
+	          splitted test feature variables for ML pipeline 
+	        Y_test - Numpy array
+	          splitted test target variables for ML pipeline 
+	Output : metric_df - Pandas DataFrame
+			   model perforance DataFrame including accuracy, precision, recall and f1 scores
+    '''
     metric_names = ['ACCURACY', 'PRECISION', 'RECALL', 'F1']
     metric_df = pd.DataFrame(columns = metric_names)
     Y_pred = model.predict(X_test)
@@ -116,10 +154,20 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    '''
+	Save model object to a model file
+	Input : model - sklearn GridSearchCV object
+			  trained model to be saved
+	        model_filepath - String
+	          file path to be saved for a trained model
+    '''
     pickle.dump(model.best_estimator_, open(model_filepath, 'wb'))
 
 
 def main():
+    '''
+    Main function of ML pipeline
+    '''
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
