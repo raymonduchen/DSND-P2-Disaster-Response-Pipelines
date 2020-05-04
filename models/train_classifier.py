@@ -80,7 +80,7 @@ def build_model():
                 ])),
                 ('starting_verb', StartingVerbExtractor())
             ])),
-            ('clf', MultiOutputClassifier( LinearSVC() ))
+            ('clf', MultiOutputClassifier( SVC() ))
         ])
     parameters = {'features__text_pipeline__vect__max_df' : [1.0],
                   'features__text_pipeline__tfidf__use_idf' : [True],
@@ -132,9 +132,11 @@ def main():
             
             print('Training model...')
             model.fit(X_train, Y_train)
+            print('Best model parameters : \n', model.best_params_)
             
             print('Evaluating model...')
-            evaluate_model(model, X_test, Y_test, category_names)
+            metrics = evaluate_model(model, X_test, Y_test, category_names)
+            print('Best model evaluation : \n', metrics.describe())
 
             print('Saving model...\n    MODEL: {}'.format(model_filepath))
             save_model(model, model_filepath)
